@@ -13,10 +13,20 @@
       font-size: 18px;
       cursor: pointer;
     }
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
     .key-box {
       margin-top: 20px;
       font-size: 18px;
       color: green;
+      min-height: 24px;
+    }
+    .error-box {
+      color: red;
+      margin-top: 20px;
+      min-height: 24px;
     }
     .key-list {
       margin-top: 40px;
@@ -29,9 +39,10 @@
 </head>
 <body>
   <h1>🎯 SIGMA Key Generator</h1>
-  <button onclick="generateKey()">Generate Key</button>
+  <button id="generate-btn" onclick="generateKey()">Generate Key</button>
 
   <div class="key-box" id="key-box"></div>
+  <div class="error-box" id="error-box"></div>
 
   <div class="key-list">
     <h3>Active Keys:</h3>
@@ -39,32 +50,56 @@
   </div>
 
   <script>
-    const API_BASE = "https://ecb6b292-6912-426d-93b9-e76d653b3df5-00-2fxj7twi0wm75.worf.replit.dev";
+    const API_BASE = "https://salty-ghosts-tease.loca.lt";
 
+    async function generateKey() {
+      const btn = document.getElementById("generate-btn");
+      const keyBox = document.getElementById("key-box");
+      const errorBox = document.getElementById("error-box");
 
-    function generateKey() {
-      fetch(`${API_BASE}/api/generate-key`, {
-        method: "POST"
-      })
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById("key-box").innerText = `✅ Key: ${data.key} (expires in 24h)`;
+      btn.disabled = true;
+      keyBox.textContent = "Generating key...";
+      errorBox.textContent = "";
+
+      try {
+        const res = await fetch(`${API_BASE}/api/generate-key`, {
+          method: "POST"
+        });
+
+        if (!res.ok) throw new Error(`Server error: ${res.status}`);
+
+        const data = await res.json();
+        keyBox.textContent = `✅ Key: ${data.key} (expires in 24h)`;
         loadActiveKeys();
-      });
+      } catch (err) {
+        errorBox.textContent = `Error: ${err.message}`;
+        keyBox.textContent = "";
+      } finally {
+        btn.disabled = false;
+      }
     }
 
-    function loadActiveKeys() {
-      fetch(`${API_BASE}/api/active-keys`)
-        .then(res => res.json())
-        .then(keys => {
-          const ul = document.getElementById("active-keys");
-          ul.innerHTML = "";
-          keys.forEach(k => {
-            const li = document.createElement("li");
-            li.innerText = `${k.key} – expires at ${new Date(k.expires).toLocaleString()}`;
-            ul.appendChild(li);
-          });
+    async function loadActiveKeys() {
+      const ul = document.getElementById("active-keys");
+      ul.innerHTML = "";
+      try {
+        const res = await fetch(`${API_BASE}/api/active-keys`);
+        if (!res.ok) throw new Error(`Server error: ${res.status}`);
+        const keys = await res.json();
+
+        if (keys.length === 0) {
+          ul.innerHTML = "<li>No active keys.</li>";
+          return;
+        }
+
+        keys.forEach(k => {
+          const li = document.createElement("li");
+          li.textContent = `${k.key} – expires at ${new Date(k.expires).toLocaleString()}`;
+          ul.appendChild(li);
         });
+      } catch (err) {
+        ul.innerHTML = `<li style="color:red;">Error loading keys: ${err.message}</li>`;
+      }
     }
 
     loadActiveKeys();
