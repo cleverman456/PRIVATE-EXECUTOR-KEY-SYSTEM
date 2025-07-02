@@ -1,1 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SIGMA Key Redemption</title>
+  <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>SIGMA Key Redemption</h1>
+  <h2 id="stage">Checkpoint 1</h2>
 
+  <div id="captcha-box">
+    <div class="h-captcha" data-sitekey="YOUR_HCAPTCHA_SITE_KEY" data-callback="onCaptchaSuccess"></div>
+  </div>
+
+  <button id="next-btn" style="display:none;" onclick="nextStage()">Next Checkpoint</button>
+
+  <script>
+    let stage = 1;
+
+    function onCaptchaSuccess(token) {
+      fetch("https://ecb6b292-6912-426d-93b9-e76d653b3df5-00-2fxj7twi0wm75.worf.replit.dev/api/verify-captcha", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById("next-btn").style.display = "inline-block";
+        } else {
+          alert("CAPTCHA failed. Try again.");
+        }
+      });
+    }
+
+    function nextStage() {
+      stage++;
+      if (stage > 3) {
+        document.body.innerHTML = "<h2>✅ All Checkpoints Complete. You may now access the generator!</h2><a href='generate.html'>Go to Generate Page</a>";
+      } else {
+        document.getElementById("stage").innerText = `Checkpoint ${stage}`;
+        document.getElementById("next-btn").style.display = "none";
+        hcaptcha.reset();
+      }
+    }
+  </script>
+</body>
+</html>
