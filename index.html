@@ -1,76 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>SIGMA Key Redemption</title>
-  <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
-  <link rel="stylesheet" href="styles.css">
+  <title>SIGMA Key System</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      margin-top: 60px;
+      margin-top: 100px;
+      background-color: #f4f4f4;
     }
-    #next-btn {
+    h1 {
+      font-size: 36px;
+      color: #333;
+    }
+    p {
+      font-size: 18px;
       margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      display: none;
+    }
+    a.button {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 12px 24px;
+      background-color: #007BFF;
+      color: white;
+      text-decoration: none;
+      font-size: 18px;
+      border-radius: 6px;
+    }
+    a.button:hover {
+      background-color: #0056b3;
     }
   </style>
 </head>
 <body>
-  <h1>SIGMA Key Redemption</h1>
-  <h2 id="stage">Checkpoint 1</h2>
 
-  <div id="captcha-box">
-    <div
-      class="h-captcha"
-      data-sitekey="db464562-3f80-4296-a648-05447ebc815e"
-      data-callback="onCaptchaSuccess"
-      data-theme="light">
-    </div>
-  </div>
+  <h1>🔐 Welcome to the SIGMA Key System</h1>
+  <p>Click below to generate your private SIGMA executor key.</p>
+  <a class="button" href="generate.html">Generate a Key</a>
 
-  <button id="next-btn" onclick="nextStage()">Next Checkpoint</button>
-
-  <script>
-    let stage = 1;
-
-    function onCaptchaSuccess(token) {
-      fetch("https://ecb6b292-6912-426d-93b9-e76d653b3df5-00-2fxj7twi0wm75.worf.replit.dev/api/verify-captcha", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          document.getElementById("next-btn").style.display = "inline-block";
-        } else {
-          alert("CAPTCHA failed. Please try again.");
-          hcaptcha.reset();
-        }
-      })
-      .catch(() => {
-        alert("Error contacting the CAPTCHA server.");
-        hcaptcha.reset();
-      });
-    }
-
-    function nextStage() {
-      stage++;
-      if (stage > 3) {
-        document.body.innerHTML = `
-          <h2>✅ All Checkpoints Complete</h2>
-          <p>You may now access the key generator.</p>
-          <a href="generate.html">➡️ Go to Generate Page</a>
-        `;
-      } else {
-        document.getElementById("stage").innerText = `Checkpoint ${stage}`;
-        document.getElementById("next-btn").style.display = "none";
-        hcaptcha.reset();
-      }
-    }
-  </script>
 </body>
 </html>

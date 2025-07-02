@@ -1,46 +1,72 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Generate Key</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Generate SIGMA Key</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      margin-top: 50px;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    .key-box {
+      margin-top: 20px;
+      font-size: 18px;
+      color: green;
+    }
+    .key-list {
+      margin-top: 40px;
+      text-align: left;
+      width: 60%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
 </head>
 <body>
-  <h1>Key Generator</h1>
+  <h1>🎯 SIGMA Key Generator</h1>
   <button onclick="generateKey()">Generate Key</button>
-  <p id="output"></p>
 
-  <h2>Active Keys</h2>
-  <ul id="key-list"></ul>
+  <div class="key-box" id="key-box"></div>
+
+  <div class="key-list">
+    <h3>Active Keys:</h3>
+    <ul id="active-keys"></ul>
+  </div>
 
   <script>
+    const API_BASE = "https://YOUR-REPLIT-URL-HERE" // <-- Change this
+
     function generateKey() {
-      fetch("https://your-replit-url.replit.app/api/generate-key", {
+      fetch(`${API_BASE}/api/generate-key`, {
         method: "POST"
       })
       .then(res => res.json())
       .then(data => {
-        document.getElementById("output").innerText = `Generated: ${data.key} (expires in 24h)`;
-        loadKeys();
+        document.getElementById("key-box").innerText = `✅ Key: ${data.key} (expires in 24h)`;
+        loadActiveKeys();
       });
     }
 
-    function loadKeys() {
-      fetch("https://your-replit-url.replit.app/api/active-keys")
+    function loadActiveKeys() {
+      fetch(`${API_BASE}/api/active-keys`)
         .then(res => res.json())
         .then(keys => {
-          const ul = document.getElementById("key-list");
+          const ul = document.getElementById("active-keys");
           ul.innerHTML = "";
           keys.forEach(k => {
-            const expires = new Date(k.expires);
-            const hoursLeft = ((expires - new Date()) / 3600000).toFixed(2);
             const li = document.createElement("li");
-            li.innerText = `${k.key} - expires in ${hoursLeft} hrs`;
+            li.innerText = `${k.key} – expires at ${new Date(k.expires).toLocaleString()}`;
             ul.appendChild(li);
           });
         });
     }
 
-    loadKeys();
+    loadActiveKeys();
   </script>
 </body>
 </html>
