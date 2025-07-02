@@ -1,42 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SIGMA Key System</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      margin-top: 100px;
-      background-color: #f4f4f4;
-    }
-    h1 {
-      font-size: 36px;
+      margin-top: 50px;
       color: #333;
     }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      color: green;
+    }
     p {
-      font-size: 18px;
-      margin-top: 20px;
+      font-size: 1.2em;
+      margin-bottom: 30px;
+      color: #555;
     }
     a.button {
-      display: inline-block;
-      margin-top: 30px;
-      padding: 12px 24px;
-      background-color: #007BFF;
+      background-color: green;
       color: white;
-      text-decoration: none;
+      padding: 12px 24px;
       font-size: 18px;
-      border-radius: 6px;
+      font-weight: bold;
+      text-decoration: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
     }
     a.button:hover {
-      background-color: #0056b3;
+      background-color: #006400; /* darker green */
     }
   </style>
 </head>
 <body>
-
-  <h1>🔐 Welcome to the SIGMA Key System</h1>
-  <p>Click below to generate your private SIGMA executor key.</p>
-  <a class="button" href="generate.html">Generate a Key</a>
-
+  <h1>SIGMA Key System</h1>
+  <p>Welcome! Generate your SIGMA keys securely and view active keys.</p>
+  <a href="generate.html" class="button">Go to Generate Page</a>
 </body>
 </html>
