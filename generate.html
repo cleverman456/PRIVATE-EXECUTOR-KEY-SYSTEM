@@ -1,1 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate Key</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>Key Generator</h1>
+  <button onclick="generateKey()">Generate Key</button>
+  <p id="output"></p>
 
+  <h2>Active Keys</h2>
+  <ul id="key-list"></ul>
+
+  <script>
+    function generateKey() {
+      fetch("https://your-replit-url.replit.app/api/generate-key", {
+        method: "POST"
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("output").innerText = `Generated: ${data.key} (expires in 24h)`;
+        loadKeys();
+      });
+    }
+
+    function loadKeys() {
+      fetch("https://your-replit-url.replit.app/api/active-keys")
+        .then(res => res.json())
+        .then(keys => {
+          const ul = document.getElementById("key-list");
+          ul.innerHTML = "";
+          keys.forEach(k => {
+            const expires = new Date(k.expires);
+            const hoursLeft = ((expires - new Date()) / 3600000).toFixed(2);
+            const li = document.createElement("li");
+            li.innerText = `${k.key} - expires in ${hoursLeft} hrs`;
+            ul.appendChild(li);
+          });
+        });
+    }
+
+    loadKeys();
+  </script>
+</body>
+</html>
