@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Firebase Connectivity Test</title>
+</head>
+<body>
+  <h1>Testing Firebase Connection...</h1>
+  <p id="status">Loading...</p>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // 🔑 Replace with your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBVCzo2atdIAGnqV4qMQ-Ran4UpnsBxHPQ",
+    authDomain: "private-executor-key-system.firebaseapp.com",
+      projectId: "private-executor-key-system",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function testFirebase() {
+      try {
+        // Make a test document
+        const testKey = "CONNECTION_TEST";
+        await setDoc(doc(db, "keys", testKey), { valid: true, created: new Date().toISOString() });
+
+        // Read the same document back
+        const snap = await getDoc(doc(db, "keys", testKey));
+
+        if (snap.exists()) {
+          document.getElementById("status").innerText = "✅ Firebase connection SUCCESS. Key stored: " + testKey;
+        } else {
+          document.getElementById("status").innerText = "❌ Firebase connected, but test doc missing.";
+        }
+      } catch (err) {
+        document.getElementById("status").innerText = "❌ Firebase ERROR: " + err.message;
+      }
+    }
+
+    testFirebase();
+  </script>
+</body>
+</html>
