@@ -1,108 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Generate SIGMA Key</title>
-  <style>
-    body {
-      font-family: Arial;
-      text-align: center;
-      margin-top: 50px;
-    }
-    button {
-      padding: 12px 24px;
-      font-size: 18px;
-      cursor: pointer;
-    }
-    button:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-    .key-box {
-      margin-top: 20px;
-      font-size: 18px;
-      color: green;
-      min-height: 24px;
-    }
-    .error-box {
-      color: red;
-      margin-top: 20px;
-      min-height: 24px;
-    }
-    .key-list {
-      margin-top: 40px;
-      text-align: left;
-      width: 60%;
-      margin-left: auto;
-      margin-right: auto;
-    }
-  </style>
+  <title>Private Executor Key System</title>
 </head>
 <body>
-  <h1>🎯 SIGMA Key Generator</h1>
-  <button id="generate-btn" onclick="generateKey()">Generate Key</button>
+  <h1>Private Executor Key System</h1>
+  <button onclick="getKey()">Generate Key</button>
+  <p id="result"></p>
 
-  <div class="key-box" id="key-box"></div>
-  <div class="error-box" id="error-box"></div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  <div class="key-list">
-    <h3>Active Keys:</h3>
-    <ul id="active-keys"></ul>
-  </div>
+    // Replace with your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBVCzo2atdIAGnqV4qMQ-Ran4UpnsBxHPQ",
+      authDomain: "private-executor-key-system.firebaseapp.com",
+      projectId: "private-executor-key-system",
+    };
 
-  <script>
-    const API_BASE = "https://salty-ghosts-tease.loca.lt";
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    async function generateKey() {
-      const btn = document.getElementById("generate-btn");
-      const keyBox = document.getElementById("key-box");
-      const errorBox = document.getElementById("error-box");
-
-      btn.disabled = true;
-      keyBox.textContent = "Generating key...";
-      errorBox.textContent = "";
-
-      try {
-        const res = await fetch(`${API_BASE}/api/generate-key`, {
-          method: "POST"
-        });
-
-        if (!res.ok) throw new Error(`Server error: ${res.status}`);
-
-        const data = await res.json();
-        keyBox.textContent = `✅ Key: ${data.key} (expires in 24h)`;
-        loadActiveKeys();
-      } catch (err) {
-        errorBox.textContent = `Error: ${err.message}`;
-        keyBox.textContent = "";
-      } finally {
-        btn.disabled = false;
-      }
+    function generateRandomKey() {
+      return Math.random().toString(36).substring(2, 10).toUpperCase();
     }
 
-    async function loadActiveKeys() {
-      const ul = document.getElementById("active-keys");
-      ul.innerHTML = "";
-      try {
-        const res = await fetch(`${API_BASE}/api/active-keys`);
-        if (!res.ok) throw new Error(`Server error: ${res.status}`);
-        const keys = await res.json();
-
-        if (keys.length === 0) {
-          ul.innerHTML = "<li>No active keys.</li>";
-          return;
-        }
-
-        keys.forEach(k => {
-          const li = document.createElement("li");
-          li.textContent = `${k.key} – expires at ${new Date(k.expires).toLocaleString()}`;
-          ul.appendChild(li);
-        });
-      } catch (err) {
-        ul.innerHTML = `<li style="color:red;">Error loading keys: ${err.message}</li>`;
-      }
+    async function getKey() {
+      const key = generateRandomKey();
+      await setDoc(doc(db, "keys", key), { valid: true, created: new Date().toISOString() });
+      document.getElementById("result").innerText = "Your Key: " + key;
     }
-
-    loadActiveKeys();
   </script>
 </body>
 </html>
