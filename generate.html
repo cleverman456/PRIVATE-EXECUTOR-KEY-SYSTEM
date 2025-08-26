@@ -5,12 +5,12 @@
 </head>
 <body>
   <h1>Private Executor Key System</h1>
-  <button onclick="getKey()">Generate Key</button>
+  <button id="generateBtn">Generate Key</button>
   <p id="result"></p>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     // Firebase config
     const firebaseConfig = {
@@ -27,35 +27,26 @@
     }
 
     async function getKey() {
-      const key = generateRandomKey();
-      const now = new Date().toISOString();
-      await setDoc(doc(db, "keys", key), { valid: true, created: now });
-      document.getElementById("result").innerText = "Your Key: " + key;
-    }
+      const resultElem = document.getElementById("result");
+      resultElem.innerText = "⏳ Generating key...";
 
-    // Optional: check if key is expired
-    async function isKeyValid(key) {
-      const docRef = doc(db, "keys", key);
-      const snap = await getDoc(docRef);
+      try {
+        const key = generateRandomKey();
+        const now = new Date().toISOString();
 
-      if (!snap.exists()) return false;
+        // Save key in Firestore
+        await setDoc(doc(db, "keys", key), { valid: true, created: now });
 
-      const data = snap.data();
-      const createdTime = new Date(data.created);
-      const now = new Date();
-
-      // 24 hours in milliseconds = 24*60*60*1000
-      if (now - createdTime > 24*60*60*1000) {
-        // Mark the key invalid
-        await updateDoc(docRef, { valid: false });
-        return false;
+        // If Firestore write succeeded
+        resultElem.innerText = "✅ Your Key: " + key;
+      } catch (err) {
+        console.error("Error generating key:", err);
+        resultElem.innerText = "❌ Error generating key: " + err.message;
       }
-
-      return data.valid === true;
     }
 
-    // Example usage:
-    // const valid = await isKeyValid("ABC12345");
+    // Attach function to button click
+    document.getElementById("generateBtn").addEventListener("click", getKey);
   </script>
 </body>
 </html>
