@@ -10,9 +10,9 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // Replace with your Firebase config
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyBVCzo2atdIAGnqV4qMQ-Ran4UpnsBxHPQ",
       authDomain: "private-executor-key-system.firebaseapp.com",
@@ -28,9 +28,34 @@
 
     async function getKey() {
       const key = generateRandomKey();
-      await setDoc(doc(db, "keys", key), { valid: true, created: new Date().toISOString() });
+      const now = new Date().toISOString();
+      await setDoc(doc(db, "keys", key), { valid: true, created: now });
       document.getElementById("result").innerText = "Your Key: " + key;
     }
+
+    // Optional: check if key is expired
+    async function isKeyValid(key) {
+      const docRef = doc(db, "keys", key);
+      const snap = await getDoc(docRef);
+
+      if (!snap.exists()) return false;
+
+      const data = snap.data();
+      const createdTime = new Date(data.created);
+      const now = new Date();
+
+      // 24 hours in milliseconds = 24*60*60*1000
+      if (now - createdTime > 24*60*60*1000) {
+        // Mark the key invalid
+        await updateDoc(docRef, { valid: false });
+        return false;
+      }
+
+      return data.valid === true;
+    }
+
+    // Example usage:
+    // const valid = await isKeyValid("ABC12345");
   </script>
 </body>
 </html>
